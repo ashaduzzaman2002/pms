@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,16 +6,68 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { mockProperties } from "@/data/mockData";
-import { ArrowLeft, MapPin, Star, Calendar, Users, Wifi, Car, Utensils, Waves, Phone, Mail } from "lucide-react";
+import { ArrowLeft, MapPin, Star, Calendar, Users, Wifi, Car, Utensils, Waves, Phone, Mail, Building2 } from "lucide-react";
+import apiService from "@/services/api";
 
 export default function PropertyDetail() {
   const { id } = useParams();
-  const property = mockProperties.find(p => p.id === id);
+  const [property, setProperty] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");
   const [guests, setGuests] = useState("2");
   const [specialRequests, setSpecialRequests] = useState("");
+
+  useEffect(() => {
+    if (id) {
+      fetchProperty();
+    }
+  }, [id]);
+
+  const fetchProperty = async () => {
+    try {
+      const data = await apiService.getProperty(id);
+      setProperty(data);
+    } catch (error) {
+      console.error('Error fetching property:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
+          <div className="container mx-auto px-4 py-4">
+            <div className="flex items-center justify-between">
+              <Button variant="ghost" asChild>
+                <Link to="/properties" className="flex items-center gap-2">
+                  <ArrowLeft className="w-4 h-4" />
+                  Back to Properties
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </header>
+        <div className="container mx-auto px-4 py-8">
+          <div className="grid lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2 space-y-6">
+              <div className="h-80 bg-gray-200 rounded-lg animate-pulse"></div>
+              <div className="space-y-4">
+                <div className="h-8 bg-gray-200 rounded animate-pulse"></div>
+                <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                <div className="h-20 bg-gray-200 rounded animate-pulse"></div>
+              </div>
+            </div>
+            <div className="lg:col-span-1">
+              <div className="h-96 bg-gray-200 rounded-lg animate-pulse"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!property) {
     return (
@@ -48,10 +100,10 @@ export default function PropertyDetail() {
     const start = new Date(checkIn);
     const end = new Date(checkOut);
     const nights = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
-    return nights > 0 ? nights * property.pricePerNight : 0;
+    return nights > 0 ? nights * property.price : 0;
   };
 
-  const nights = calculateTotal() / property.pricePerNight || 0;
+  const nights = calculateTotal() / property.price || 0;
 
   return (
     <div className="min-h-screen bg-background">
@@ -83,14 +135,15 @@ export default function PropertyDetail() {
           <div className="lg:col-span-2 space-y-6">
             {/* Image Gallery */}
             <div className="relative rounded-lg overflow-hidden">
-              <img
-                src={property.images[0]}
-                alt={property.name}
-                className="w-full h-80 object-cover"
-              />
-              <Badge className="absolute top-4 left-4 bg-white/90 text-primary">
-                {property.type}
-              </Badge>
+              {property.images && property.images.length > 0 ? (
+                <img
+                  src={`http://localhost:5000${property.images[0]}`}
+                  alt={property.name}
+                  className="w-full h-80 object-cover"
+                />
+              ) : (
+                <div className="w-full h-80 bg-gradient-to-br from-blue-100 to-purple-100"></div>
+              )}
             </div>
 
             {/* Property Info */}
@@ -102,10 +155,23 @@ export default function PropertyDetail() {
                     <MapPin className="w-4 h-4" />
                     <span>{property.location}</span>
                   </div>
-                  <p className="text-sm text-muted-foreground">{property.address}</p>
+                  <div className="grid grid-cols-3 gap-4 mt-4">
+                    <div className="flex items-center gap-2">
+                      <Building2 className="h-4 w-4" />
+                      <span className="text-sm">{property.bedrooms || 0} Bedrooms</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Building2 className="h-4 w-4" />
+                      <span className="text-sm">{property.bathrooms || 0} Bathrooms</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Users className="h-4 w-4" />
+                      <span className="text-sm">{property.maxGuests || 0} Guests</span>
+                    </div>
+                  </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-3xl font-bold text-primary">${property.pricePerNight}</div>
+                  <div className="text-3xl font-bold text-primary">${property.price}</div>
                   <div className="text-sm text-muted-foreground">per night</div>
                 </div>
               </div>
@@ -119,53 +185,29 @@ export default function PropertyDetail() {
                 <span className="text-sm text-muted-foreground">4.8 (124 reviews)</span>
               </div>
 
-              <p className="text-muted-foreground leading-relaxed">{property.description}</p>
+              {property.description && (
+                <p className="text-muted-foreground leading-relaxed">{property.description}</p>
+              )}
             </div>
 
             {/* Amenities */}
-            <Card>
-              <CardHeader>
-                <CardTitle>What this place offers</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid md:grid-cols-2 gap-4">
-                  {property.amenities.map((amenity, index) => (
-                    <div key={index} className="flex items-center gap-3">
-                      {getAmenityIcon(amenity)}
-                      <span>{amenity}</span>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Host Information */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Meet your host</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="w-16 h-16 bg-gradient-primary rounded-full flex items-center justify-center text-white font-bold text-xl">
-                    {property.owner.name.split(' ').map(n => n[0]).join('')}
+            {property.amenities && property.amenities.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>What this place offers</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    {property.amenities.map((amenity, index) => (
+                      <div key={index} className="flex items-center gap-3">
+                        {getAmenityIcon(amenity)}
+                        <span>{amenity}</span>
+                      </div>
+                    ))}
                   </div>
-                  <div>
-                    <h3 className="font-semibold text-lg">{property.owner.name}</h3>
-                    <p className="text-muted-foreground">Property Owner</p>
-                  </div>
-                </div>
-                <div className="flex flex-col gap-2">
-                  <div className="flex items-center gap-2">
-                    <Mail className="w-4 h-4" />
-                    <span className="text-sm">{property.owner.email}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Phone className="w-4 h-4" />
-                    <span className="text-sm">+1 (555) 123-4567</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            )}
           </div>
 
           {/* Booking Form */}
@@ -174,8 +216,8 @@ export default function PropertyDetail() {
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
                   <span>Reserve</span>
-                  <Badge variant={property.availabilityStatus === "available" ? "default" : "destructive"}>
-                    {property.availabilityStatus}
+                  <Badge variant={property.isActive ? "default" : "destructive"}>
+                    {property.isActive ? "Available" : "Not Available"}
                   </Badge>
                 </CardTitle>
               </CardHeader>
@@ -209,7 +251,7 @@ export default function PropertyDetail() {
                     id="guests"
                     type="number"
                     min="1"
-                    max="10"
+                    max={property.maxGuests || 10}
                     value={guests}
                     onChange={(e) => setGuests(e.target.value)}
                   />
@@ -228,7 +270,7 @@ export default function PropertyDetail() {
                 {checkIn && checkOut && (
                   <div className="space-y-2 pt-4 border-t">
                     <div className="flex justify-between">
-                      <span>${property.pricePerNight} × {nights} nights</span>
+                      <span>${property.price} × {nights} nights</span>
                       <span>${calculateTotal()}</span>
                     </div>
                     <div className="flex justify-between">
@@ -244,11 +286,11 @@ export default function PropertyDetail() {
 
                 <Button 
                   className="w-full bg-gradient-primary hover:bg-primary-hover"
-                  disabled={property.availabilityStatus !== "available" || !checkIn || !checkOut}
+                  disabled={!property.isActive || !checkIn || !checkOut}
                   asChild
                 >
-                  <Link to={`/booking/confirm/${property.id}?checkin=${checkIn}&checkout=${checkOut}&guests=${guests}`}>
-                    {property.availabilityStatus === "available" ? "Reserve Now" : "Not Available"}
+                  <Link to={`/booking/confirm/${property._id}?checkin=${checkIn}&checkout=${checkOut}&guests=${guests}`}>
+                    {property.isActive ? "Reserve Now" : "Not Available"}
                   </Link>
                 </Button>
               </CardContent>
