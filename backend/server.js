@@ -18,7 +18,12 @@ app.use('/api/users', require('./routes/users'));
 app.use('/api/housekeeping', require('./routes/housekeeping'));
 app.use('/api/maintenance', require('./routes/maintenance'));
 
+app.get('/', (req, res) => {
+  res.send('Property Management System API');
+});
+
 // MongoDB connection
+
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/property-management')
   .then(() => console.log('MongoDB connected'))
   .catch(err => console.error('MongoDB connection error:', err));

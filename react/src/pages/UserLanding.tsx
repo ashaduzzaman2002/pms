@@ -170,7 +170,7 @@ const UserLanding = () => {
                   <div className="h-64 relative overflow-hidden">
                     {property.images && property.images.length > 0 ? (
                       <img
-                        src={`http://localhost:5000${property.images[0]}`}
+                        src={import.meta.env.VITE_IMAGE_URL + property.images[0]}
                         alt={property.name}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />

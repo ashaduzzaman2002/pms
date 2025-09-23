@@ -137,7 +137,7 @@ export default function PropertyDetail() {
             <div className="relative rounded-lg overflow-hidden">
               {property.images && property.images.length > 0 ? (
                 <img
-                  src={`http://localhost:5000${property.images[0]}`}
+                  src={import.meta.env.VITE_IMAGE_URL+property.images[0]}
                   alt={property.name}
                   className="w-full h-80 object-cover"
                 />

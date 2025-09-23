@@ -97,7 +97,7 @@ const AdminPropertyDetail = () => {
               {property.images.map((image, index) => (
                 <img
                   key={index}
-                  src={`http://localhost:5000${image}`}
+                  src={import.meta.env.VITE_IMAGE_URL+image}
                   alt={`${property.name} - Image ${index + 1}`}
                   className="w-full h-48 object-cover rounded-lg"
                 />

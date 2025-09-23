@@ -229,7 +229,7 @@ export const PropertyModal = ({ isOpen, onClose, onSave, property }: PropertyMod
                     {existingImages.map((image, index) => (
                       <div key={index} className="relative group">
                         <img
-                          src={`http://localhost:5000${image}`}
+                          src={import.meta.env.VITE_IMAGE_URL+image}
                           alt={`Property ${index + 1}`}
                           className="w-full h-20 object-cover rounded border"
                         />
