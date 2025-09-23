@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -8,6 +9,7 @@ import { PropertyModal } from "@/components/PropertyModal";
 import apiService from "@/services/api";
 
 const Properties = () => {
+  const navigate = useNavigate();
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
@@ -37,6 +39,10 @@ const Properties = () => {
   const handleEdit = (property: any) => {
     setEditingProperty(property);
     setModalOpen(true);
+  };
+
+  const handleView = (propertyId: string) => {
+    navigate(`/admin/properties/${propertyId}`);
   };
 
   const handleDelete = async (propertyId: string) => {
@@ -179,7 +185,12 @@ const Properties = () => {
               )}
 
               <div className="flex gap-2">
-                <Button variant="outline" size="sm" className="flex-1">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="flex-1"
+                  onClick={() => handleView(property._id)}
+                >
                   <Eye className="h-3 w-3 mr-1" />
                   View
                 </Button>

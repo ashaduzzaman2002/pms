@@ -29,6 +29,7 @@ const UserLogin = React.lazy(() => import("./pages/UserLogin"));
 const UserRegister = React.lazy(() => import("./pages/UserRegister"));
 const UserBookings = React.lazy(() => import("./pages/UserBookings"));
 const BookingConfirm = React.lazy(() => import("./pages/BookingConfirm"));
+const AdminPropertyDetail = React.lazy(() => import("./pages/AdminPropertyDetail"));
 
 // Enhanced Query Client with better defaults
 const queryClient = new QueryClient({
@@ -126,6 +127,7 @@ const App = () => (
                           <Routes>
                             <Route path="/" element={<Dashboard />} />
                             <Route path="/properties" element={<Properties />} />
+                            <Route path="/properties/:id" element={<AdminPropertyDetail />} />
                             <Route path="/bookings" element={<Bookings />} />
                             <Route path="/tenants" element={<Tenants />} />
                             <Route path="/owners" element={<Owners />} />
