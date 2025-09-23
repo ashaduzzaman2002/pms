@@ -415,6 +415,49 @@ class ApiService {
     return this.patch(`/bookings/${id}/status`, { status });
   }
 
+  // Maintenance API
+  async getMaintenanceRequests(filters: Record<string, any> = {}) {
+    return this.get('/maintenance', filters);
+  }
+
+  async createMaintenanceRequest(requestData: any) {
+    return this.post('/maintenance', requestData);
+  }
+
+  async updateMaintenanceRequest(id: string, requestData: any) {
+    return this.put(`/maintenance/${id}`, requestData);
+  }
+
+  async deleteMaintenanceRequest(id: string) {
+    return this.delete(`/maintenance/${id}`);
+  }
+
+  // Users API
+  async getUsers(filters: Record<string, any> = {}) {
+    return this.get('/users', filters);
+  }
+
+  async getUser(id: string) {
+    return this.get(`/users/${id}`);
+  }
+
+  // Housekeeping API
+  async getHousekeepingTasks(filters: Record<string, any> = {}) {
+    return this.get('/housekeeping', filters);
+  }
+
+  async createHousekeepingTask(taskData: any) {
+    return this.post('/housekeeping', taskData);
+  }
+
+  async updateHousekeepingTask(id: string, taskData: any) {
+    return this.put(`/housekeeping/${id}`, taskData);
+  }
+
+  async deleteHousekeepingTask(id: string) {
+    return this.delete(`/housekeeping/${id}`);
+  }
+
   // WebSocket setup
   setupWebSocket(userId: string): WebSocket {
     if (this.ws) {

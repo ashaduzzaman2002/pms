@@ -23,16 +23,10 @@ export const HousekeepingModal = ({ isOpen, onClose, onSave, task }: Housekeepin
     priority: "medium",
     scheduledDate: ""
   });
-  const [properties, setProperties] = useState([]);
-  const [users, setUsers] = useState([]);
+  const [properties, setProperties] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (isOpen) {
-      fetchData();
-    }
-  }, [isOpen]);
-
+  
   useEffect(() => {
     if (task) {
       setFormData({
@@ -55,18 +49,21 @@ export const HousekeepingModal = ({ isOpen, onClose, onSave, task }: Housekeepin
     }
   }, [task, isOpen]);
 
-  const fetchData = async () => {
-    try {
-      const [propertiesData, usersData] = await Promise.all([
-        apiService.getProperties(),
-        apiService.getUsers()
-      ]);
-      setProperties(propertiesData);
-      setUsers(usersData);
-    } catch (error) {
-      console.error('Error fetching data:', error);
+
+    const fetchProperties = async () => {
+      try {
+        const data = await apiService.getProperties();
+        setProperties(data);
+      } catch (error) {
+        console.error('Error fetching properties:', error);
+      }
+    };
+
+      useEffect(() => {
+    if (isOpen) {
+      fetchProperties();
     }
-  };
+  }, [isOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -101,7 +98,7 @@ export const HousekeepingModal = ({ isOpen, onClose, onSave, task }: Housekeepin
           <DialogTitle>{task ? "Edit Task" : "Add Housekeeping Task"}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
+            <div>
             <Label htmlFor="property">Property</Label>
             <Select value={formData.property} onValueChange={(value) => setFormData({ ...formData, property: value })}>
               <SelectTrigger>
