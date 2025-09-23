@@ -25,7 +25,7 @@ const ProtectedRoute = ({
   requireAuth = true, 
   requiredRoles = [], 
   requiredPermissions = [],
-  fallbackPath = '/login',
+  fallbackPath = '/user/login',
   unauthorizedPath = '/unauthorized'
 }: ProtectedRouteProps) => {
   const { 
