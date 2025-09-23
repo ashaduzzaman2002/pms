@@ -97,6 +97,7 @@ const App = () => (
                   <Route path="/properties" element={<PublicPropertyListing />} />
                   <Route path="/property/:id" element={<PropertyDetail />} />
                   <Route path="/user/login" element={<UserLogin />} />
+                  <Route path="/admin/login" element={<UserLogin />} />
                   <Route path="/user/register" element={<UserRegister />} />
                   
                   {/* Protected User Routes */}
